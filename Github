@@ -202,3 +202,41 @@ git add
 git commit
 ↓
 git push
+
+
+
+
+
+
+
+
+
+Branch switching in git and changes saving
+
+git stash >>> temporary changes in a branc
+ 
+
+
+git stash -u >>> saving changes in branch 
+git stash --include-untracked >> saving untracked files
+
+>>>switch branch
+
+  git checkout dev
+
+git stash list  ---- it verify the untracked changes saved or not
+
+
+>>>come to the changes branchs
+  
+  git checkout main
+
+  git stash pop >>> changes willl be restored
+  git checkout apply
+
+git branch -d dev >> delete branch
+git checkout -b dev >>> create and swith
+git branch >>> shows branch
+
+
+
