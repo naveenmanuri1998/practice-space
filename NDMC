@@ -1,0 +1,99 @@
+ssh naveen@172.16.158.11
+naveen@123
+
+
+172.16.158.12 proxy1
+172.16.158.13 proxy2
+172.16.158.14 wso2adsapim1
+172.16.158.15 wso2adsapim2
+172.16.158.16 apimdb1
+172.16.158.17 apimdb2
+172.16.158.18 wso2adsapim3
+172.16.158.19 abs1
+172.16.158.20 abs2
+172.16.158.21 abs3
+172.16.158.22 micro1
+172.16.158.23 micro2
+172.16.158.24 core1
+172.16.158.25 core2
+172.16.158.26 entity1
+172.16.158.27 entity2
+172.16.158.28 elk1
+172.16.158.29 elk2
+172.16.158.30 elk3
+172.16.158.31 kafka1
+172.16.158.32 kafka2
+172.16.158.33 kafka3
+172.16.158.34 elastic1
+172.16.158.35 elastic2
+172.16.158.36 elastic3
+172.16.158.37 time1
+172.16.158.38 time2
+172.16.158.39 recore1
+172.16.158.40 recore2
+172.16.158.41 training1
+172.16.158.42 training2
+172.16.158.43 custom1
+172.16.158.44 custom2
+172.16.158.45 qmms1
+172.16.158.46 qmms2
+172.16.158.52 auto
+
+
+>> VPN
+
+Username:- prudhviraju.kalidindi@quantela.com
+passwd:- lnt@123
+
+URL
+
+https://vpn.ndmc.gov.in/
+
+
+
+cd /opt/deployments/services/smartparking ---- Python (Data scienec services)-- Likitha, Vyshnavi
+
+Any changes done to the files
+
+pm2 list
+pm2 restart all
+
+ps -p 2613861 -o pid,lstart,cmd -- How can we check service restarted or not time?
+
+/data/efs/re_logs  -- logs
+
+re_logs_Quantela-RE-TRAINING1.log
+
+
+scp naveen@172.16.158.41:/tmp/re_logs_Quantela-RE-TRAINING1.log .
+
+Alt + Tab > previous window
+shift | Insert > Paste
+
+
+Time UTC >> +530hrss
+
+
+
+
+mails for apis
+
+
+assertion.sh >> add api
+
+cd /opt/newman/newman
+
+assertion.html
+Noassertion.html
+
+if mails not triggered for the dat
+
+nohup ./assertions.sh &
+nohup ./Noassertions.sh &
+
+git stash -u
+git pull
+branch switch
+again go to branch
+git stash pop/apply
+
