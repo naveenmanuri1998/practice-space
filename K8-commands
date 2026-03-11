@@ -1,0 +1,45 @@
+    kubectl get ns
+    kubectl get configmaps -n ai-qp-lite
+    kubectl get secrets -n ai-qp-lite
+    kubectl get pods -n ai-qp-lite
+
+    >>env variables
+
+    kubectl exec -it qp-web-ui-service-55b6c554dd-27v2p -n ai-qp-lite -- env 
+
+kubectl get all -n ai-qp-lite -o yaml > resources.yaml
+>>secrets
+
+kubectl get secrets -n ai-qp-lite -o yaml > secrets.yaml
+
+>>config maps
+
+kubectl get configmaps -n ai-qp-lite -o yaml > configmaps.yaml
+>>>>
+kubectl get deployments,statefulsets,daemonsets -n ai-qp-lite -o yaml > workloads.yaml
+
+>>image search
+kubectl get deployments -n ai-qp-lite -o yaml | grep -iE image
+
+>>restart all pods
+
+kubectl rollout restart deployment -n ai-qp-lite
+
+
+logs for the pod
+
+kubectl -n ai-qp-lite  logs -f qp-entity-timeseries-status-imp-exp-service-ret-5f6c8d794842qg6
+kubeclt describe pod -n istio-system istio-ingressgateway-7c8b4f69dc-gmkfv
+
+>> edit deploy
+
+kubectl -n ai-qp-lite edit deploy qp-entity-timeseries-status-imp-exp-service-ing
+
+>> hpa
+
+kubectl get hpa -n ai-qp-lite
+
+
+
+
+
