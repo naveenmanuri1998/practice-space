@@ -1,0 +1,49 @@
+vi /etc/logrotate.d/surendra-log
+
+
+/var/log/surendra.log {
+    daily
+    rotate 30
+    maxage 30
+    dateext
+    dateformat -%Y-%m-%d
+    compress
+    copytruncate
+    missingok
+    notifempty
+}
+
+logrotate -d /etc/logrotate.d/surendra-log
+logrotate -f /etc/logrotate.d/surendra-log
+
+
+Example after tomorrow:
+
+surendra.log
+surendra.log-2026-03-13
+surendra.log-2026-03-12.gz
+
+cron
+
+crontab -e
+crontab -l
+
+0 14 * * * /usr/sbin/logrotate /etc/logrotate.d/surendra-log
+
+0 14 * * *
+│ │  │ │ │
+│ │  │ │ └─ Day of week
+│ │  │ └── Month
+│ │  └──── Day of month
+│ └─────── Hour (14 = 2 PM)
+└───────── Minute
+
+Run at 14:00 (2:00 PM) every day
+
+Dry run
+
+/usr/sbin/logrotate -f /etc/logrotate.d/surendra-log
+
+
+
+
