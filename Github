@@ -239,4 +239,14 @@ git checkout -b dev >>> create and swith
 git branch >>> shows branch
 
 
+cloning other git repos and pushing them to our account
+
+cd folder
+git remote -v
+
+change intio our account
+git remote set-url origin https://github.com/naveenmanuri1998/Linux.git
+
+git push origin main
+
 
