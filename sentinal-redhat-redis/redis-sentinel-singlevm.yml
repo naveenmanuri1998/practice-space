@@ -1,0 +1,138 @@
+# ==========================================
+# File: redis-sentinel-singlevm.yml
+# Run:
+# ansible-playbook -i inventory.ini redis-sentinel-singlevm.yml
+# ==========================================
+
+---
+- name: Setup Redis Sentinel Lab on Single RedHat VM
+  hosts: redis
+  become: yes
+
+  vars:
+    redis_rpm: /tmp/redis-6.2.6-1.el9.x86_64.rpm
+    redis_port_master: 6379
+    redis_port_replica: 6380
+    server_ip: 10.30.1.60
+
+  tasks:
+
+    - name: Copy Redis RPM
+      copy:
+        src: redis-6.2.6-1.el9.x86_64.rpm
+        dest: "{{ redis_rpm }}"
+
+    - name: Install Redis RPM
+      yum:
+        name: "{{ redis_rpm }}"
+        state: present
+        disable_gpg_check: yes
+
+    - name: Create directories
+      file:
+        path: "{{ item }}"
+        state: directory
+        mode: '0755'
+      loop:
+        - /etc/redis
+        - /var/lib/redis
+        - /var/log/redis
+
+    # ---------------- MASTER ----------------
+    - name: Create master config
+      copy:
+        dest: /etc/redis/redis-master.conf
+        content: |
+          bind 0.0.0.0
+          port {{ redis_port_master }}
+          daemonize yes
+          dir /var/lib/redis
+          logfile /var/log/redis-master.log
+          protected-mode no
+
+    - name: Start master redis
+      shell: redis-server /etc/redis/redis-master.conf
+      args:
+        creates: /var/run/redis_6379.pid
+
+    # ---------------- REPLICA ----------------
+    - name: Create replica config
+      copy:
+        dest: /etc/redis/redis-replica.conf
+        content: |
+          bind 0.0.0.0
+          port {{ redis_port_replica }}
+          daemonize yes
+          dir /var/lib/redis
+          logfile /var/log/redis-replica.log
+          replicaof {{ server_ip }} {{ redis_port_master }}
+          protected-mode no
+
+    - name: Start replica redis
+      shell: redis-server /etc/redis/redis-replica.conf
+      args:
+        creates: /var/run/redis_6380.pid
+
+    # ---------------- SENTINEL 1 ----------------
+    - name: Create sentinel 26379
+      copy:
+        dest: /etc/redis/sentinel-26379.conf
+        content: |
+          port 26379
+          daemonize yes
+          sentinel monitor mymaster {{ server_ip }} {{ redis_port_master }} 2
+          sentinel down-after-milliseconds mymaster 5000
+          sentinel failover-timeout mymaster 10000
+          sentinel parallel-syncs mymaster 1
+          logfile /var/log/sentinel-26379.log
+          protected-mode no
+
+    # ---------------- SENTINEL 2 ----------------
+    - name: Create sentinel 26380
+      copy:
+        dest: /etc/redis/sentinel-26380.conf
+        content: |
+          port 26380
+          daemonize yes
+          sentinel monitor mymaster {{ server_ip }} {{ redis_port_master }} 2
+          sentinel down-after-milliseconds mymaster 5000
+          sentinel failover-timeout mymaster 10000
+          sentinel parallel-syncs mymaster 1
+          logfile /var/log/sentinel-26380.log
+          protected-mode no
+
+    # ---------------- SENTINEL 3 ----------------
+    - name: Create sentinel 26381
+      copy:
+        dest: /etc/redis/sentinel-26381.conf
+        content: |
+          port 26381
+          daemonize yes
+          sentinel monitor mymaster {{ server_ip }} {{ redis_port_master }} 2
+          sentinel down-after-milliseconds mymaster 5000
+          sentinel failover-timeout mymaster 10000
+          sentinel parallel-syncs mymaster 1
+          logfile /var/log/sentinel-26381.log
+          protected-mode no
+
+    - name: Start sentinel 26379
+      shell: redis-server /etc/redis/sentinel-26379.conf --sentinel
+      args:
+        creates: /var/run/redis-sentinel-26379.pid
+
+    - name: Start sentinel 26380
+      shell: redis-server /etc/redis/sentinel-26380.conf --sentinel
+      args:
+        creates: /var/run/redis-sentinel-26380.pid
+
+    - name: Start sentinel 26381
+      shell: redis-server /etc/redis/sentinel-26381.conf --sentinel
+      args:
+        creates: /var/run/redis-sentinel-26381.pid
+
+    - name: Verify processes
+      shell: ps -ef | grep redis | grep -v grep
+      register: redis_status
+
+    - debug:
+        var: redis_status.stdout_lines
