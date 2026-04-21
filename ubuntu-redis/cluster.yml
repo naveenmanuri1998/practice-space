@@ -1,0 +1,17 @@
+---
+- hosts: vm1
+  become: yes
+  gather_facts: no
+
+  tasks:
+
+    - name: Create 6-node Redis Cluster (3 Masters + 3 Replicas)
+      shell: |
+        yes yes | redis-cli --cluster create \
+        10.30.1.55:6379 \
+        10.30.1.56:6379 \
+        10.30.1.57:6379 \
+        10.30.1.55:7000 \
+        10.30.1.56:7000 \
+        10.30.1.57:7000 \
+        --cluster-replicas 1
