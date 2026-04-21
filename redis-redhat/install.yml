@@ -1,0 +1,102 @@
+# install.yml  (RedHat / Rocky / AlmaLinux)
+---
+- hosts: redis
+  become: yes
+
+  tasks:
+
+    - name: Copy Redis RPM
+      copy:
+        src: /home/naveen_manuri/redis/redis-6.2.6-1.el9.x86_64.rpm
+        dest: /tmp/redis-6.2.6-1.el9.x86_64.rpm
+
+    - name: Install Redis RPM
+      yum:
+        name: /tmp/redis-6.2.6-1.el9.x86_64.rpm
+        state: present
+        disable_gpg_check: yes
+
+    # ---------------- MASTER INSTANCE ----------------
+
+    - name: Create master directories
+      file:
+        path: "{{ item }}"
+        state: directory
+        mode: '0755'
+      loop:
+        - /etc/redis-master
+        - /var/lib/redis-master
+        - /var/log/redis-master
+
+    - name: Configure Redis Master
+      copy:
+        dest: /etc/redis-master/redis.conf
+        content: |
+          bind 0.0.0.0
+          protected-mode no
+          port 6379
+          daemonize yes
+          pidfile /var/run/redis-master.pid
+          logfile /var/log/redis-master/redis.log
+          dir /var/lib/redis-master
+
+          cluster-enabled yes
+          cluster-config-file nodes-6379.conf
+          cluster-node-timeout 5000
+          appendonly yes
+
+    # ---------------- SLAVE INSTANCE ----------------
+
+    - name: Create slave directories
+      file:
+        path: "{{ item }}"
+        state: directory
+        mode: '0755'
+      loop:
+        - /etc/redis-slave
+        - /var/lib/redis-slave
+        - /var/log/redis-slave
+
+    - name: Configure Redis Slave
+      copy:
+        dest: /etc/redis-slave/redis.conf
+        content: |
+          bind 0.0.0.0
+          protected-mode no
+          port 7000
+          daemonize yes
+          pidfile /var/run/redis-slave.pid
+          logfile /var/log/redis-slave/redis.log
+          dir /var/lib/redis-slave
+
+          cluster-enabled yes
+          cluster-config-file nodes-7000.conf
+          cluster-node-timeout 5000
+          appendonly yes
+
+    # ---------------- FIREWALL ----------------
+
+    - name: Open Redis ports
+      shell: |
+        firewall-cmd --permanent --add-port=6379/tcp || true
+        firewall-cmd --permanent --add-port=7000/tcp || true
+        firewall-cmd --reload || true
+
+    # ---------------- STOP OLD ----------------
+
+    - name: Stop default Redis service
+      service:
+        name: redis
+        state: stopped
+      ignore_errors: yes
+
+    - name: Kill old redis processes
+      shell: pkill redis-server || true
+
+    # ---------------- START INSTANCES ----------------
+
+    - name: Start master instance
+      shell: redis-server /etc/redis-master/redis.conf
+
+    - name: Start slave instance
+      shell: redis-server /etc/redis-slave/redis.conf
