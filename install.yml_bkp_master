@@ -1,0 +1,43 @@
+---
+- hosts: redis
+  become: yes
+
+  tasks:
+
+    - name: Copy bundle
+      copy:
+        src: /home/naveen_manuri/redis/redis-offline-bundle.tar.gz
+        dest: /tmp/redis-offline-bundle.tar.gz
+
+    - name: Create folder
+      file:
+        path: /tmp/redisbundle
+        state: directory
+
+    - name: Extract bundle
+      unarchive:
+        src: /tmp/redis-offline-bundle.tar.gz
+        dest: /tmp/redisbundle
+        remote_src: yes
+
+    - name: Install all deb packages
+      shell: dpkg -i /tmp/redisbundle/*.deb || apt-get install -f -y
+
+    - name: Configure redis
+      copy:
+        dest: /etc/redis/redis.conf
+        content: |
+          bind 0.0.0.0
+          protected-mode no
+          port 6379
+          cluster-enabled yes
+          cluster-config-file nodes.conf
+          cluster-node-timeout 5000
+          appendonly yes
+          dir /var/lib/redis
+
+    - name: Restart redis
+      service:
+        name: redis-server
+        state: restarted
+        enabled: yes
